@@ -1,0 +1,29 @@
+
+<div class="container">
+
+  <div class="row" >
+      	<div class="col-md-12">
+
+      		<h1>Login</h1>
+
+ <p class="error formerror" ng-show="message">{{ message }}</p>
+
+<form name="myform" ng-submit="login()"novalidate>
+  <div class="form-group">
+    <label for="email">Email address</label>
+    <input type ="email" id="email" name="email" placeholder="Email"
+	ng-model="user.email" ng-required="true">
+	<p class="error validationerror" ng-show="myform.email.$invalid && myform.email.$touched">Must be a valid email</p>
+  </div>
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Password"
+	ng-model="user.password" ng-required="true">
+	<p class="error validationerror" ng-show="myform.password.$invalid && myform.password.$touched">Must be a valid password</p>
+  </div>
+ 
+  <button ng-disabled="myform.$invalid"type="submit" class="btn btn-default">Submit</button>
+</form>
+
+</div></div></div>
+

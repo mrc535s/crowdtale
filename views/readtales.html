@@ -1,0 +1,69 @@
+<div class="container">
+      <!-- Example row of columns -->
+
+     <div class ="row" > 
+
+     	<div class="col-md-9"><h1>All Tale's</h1> </div>
+     	<div class="col-md-3" style="margin-top:20px">
+
+     		       <div class="form-group">
+			        	<label for="type">Filter Results by Genre</label>
+			        	<select class="form-control" ng-model="genrefilter" name="genreFilter">
+			        		<option ng-selected="true">All</option>
+			        		<option>Thriller</option>
+						    <option>Educational</option>
+						    <option>Action</option>
+						    <option>Comedy</option>
+						    <option>Drama</option>
+						    <option>Something New</option>
+						  </select>
+
+			        </div>
+		</div>
+   <div class="row">
+
+
+<div class="col-md-12">
+
+<div class="col-md-4" ng-repeat="(key, tale) in talesArray  | filterGenre:genrefilter"> 
+      <div class="panel panel-default" >
+
+        <div class="panel-heading">
+        	        
+
+            <h1 class="panel-title" >{{tale.title}} ({{tale.genre}})</h1>
+
+
+        </div>
+
+        <div class="panel-body">
+
+			    <form>
+			        <div class="form-group">
+
+			            <p > {{tale.description}} </p>
+
+			        </div>
+
+			        <div class="form-group">
+
+			           <p > <strong>{{tale.type}}</strong> </p> <timer end-time='tale.futureDate'>{{days}} days, {{hours}} hours, {{minutes}} minutes, {{seconds}} seconds.</timer>
+
+			        </div>
+			       <a ng-href="#/read-tales/{{tale.$id}}" type="submit"  class="btn btn-primary">Read Tale</a>
+			        <a ng-href="#/write-tale/{{tale.$id}}" type="submit"  class="btn btn-default">Write Tale</a>
+			       
+
+			    </form>
+        </div>
+
+    </div>
+
+       </div>
+
+        </div>
+</div>
+
+  </div>
+
+

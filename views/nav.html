@@ -1,0 +1,40 @@
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">CrowdTale</a>
+        </div>
+        <div ng-controller="StatusController" id="navbar" class="navbar-collapse collapse">
+
+        <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#">About</a></li>
+              <li class="dropdown">
+                <a  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tales <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#/tales">My Tales</a></li>
+                  <li><a href="#/read-tales">Read Tales</a></li>
+                  <li><a ng-hide="currentUser" href="#/register">Become a Writer</a></li>
+                </ul>
+              </li>
+            </ul>
+              <div  class="navbar-form navbar-right" ng-show="currentUser">
+                <span class="user" style="color: white;">Hi {{currentUser.firstname}}</span>
+              <a class="btn btn-default" href="#" ng-click="logout()">Logout</a> </div>
+          <form name="myform" ng-controller="RegistrationController" ng-hide="currentUser" class="navbar-form navbar-right" ng-submit="login()"novalidate>
+            <div class="form-group">
+              <input type="text" placeholder="Email" ng-model="user.email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" ng-model="user.password" placeholder="Password" class="form-control">
+            </div>
+            <button ng-disabled="myform.$invalid" type="submit" class="btn btn-success">Sign in</button>
+            <a href = "#/register" class="btn btn-default" > Register</a>
+          </form>
+
+        </div><!--/.navbar-collapse -->
+      </div>

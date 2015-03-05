@@ -1,0 +1,79 @@
+<div class="container">
+
+
+      <!-- Example row of columns -->
+   <div  class="row">
+        <div class="col-md-12">
+
+  
+        </div>
+
+
+
+       </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+              <div class="panel-heading">
+               <h2>{{thistale.title}} </h2> <p class="list-group-item-text">Total words: {{thistale.totalWords}} / {{thistale.maxWords}}</p> <span ng-hide="taleChapter.published"><span ng-hide="userDraw"><a class="btn btn-primary" ng-show="taleOpen" ng-click="takeControl()" role="button">Start Writing&raquo;</a></span></span> <a class="btn btn-primary" ng-show="publishButton" ng-click="publishTale()" role="button">Publish Tale</a>
+
+              </div>
+              <div class="panel-body">
+               <div class="list-group">
+                  <div class="list-group-item">
+                    <h5 class="list-group-item-heading">{{thistale.description}}</h5>
+                    <p>Total Chapter Words: <span ng-bind="countOf(taleChapter.text)"></span>/{{thistale.maxWordsPerUser}}</p>
+
+                  </div>
+                </div>
+                <div  class="well">
+
+                  <div ng-repeat="(key,chapter) in paged.chapters" ng-init="loadCanvas(chapter.author, key)" class="row">
+            <div class="col-md-6">
+
+              <div ng-show="msgSaved" class="alert alert-success alert-dismissible" role="alert">
+  <button type="button" class="close" ng-click="closeMsg()"  aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  Story has been saved.
+</div>
+
+                          <div ng-hide="taleChapter.published"><div ng-show="showEditor"> <button ng-disabled="msgshow" ng-click="saveTale()"  type="button" class="btn btn-default btn-lg">
+  <span class='glyphicon glyphicon-floppy-disk' aria-hidden="true"></span>
+</button> <button ng-disabled="msgshow" ng-click="publishTaleChapter()" ng-show="showPublishTaleButton" type="button" class="btn btn-default btn-lg">
+  <span class='glyphicon glyphicon-upload' aria-hidden="true"></span>
+</button>
+        <textarea id="writeArea" class="form-control" style="width:90%; margin-top: 10px; height: 200px;" ng-model = "taleChapter.text"></textarea> </div>  </div>  
+
+        <div > 
+
+          
+
+
+         <p>{{chapter.text}} </p> </div>
+       </div> 
+
+
+        <div class="col-md-6">
+
+        <span ng-hide="publishOnly"> <span ng-hide="showEditor"> <a class="btn btn-primary" ng-click="drawImg(chapter.author)" ng-hide="userDraw" role="button">Draw Image</a></span> </span>
+        <div class="l-demo-container" ng-show="taleOpen" > <div ng-show="userDraw">
+          <a class="btn btn-primary" ng-click="clearImage()" ng-show="imageAuthor" role="button">Clear Image</a> <a class="btn btn-primary" ng-click="publishImage(chapter.author)" ng-show="imageAuthor" role="button">Publish</a> 
+        <canvas id="drawing-canvas-{{key}}" width="480" height="420"></canvas>     <div id="colorholder" ng-show="taleOpen"></div> </div>
+
+      </div>
+  
+
+       
+        </div> </div>
+     
+
+   
+       
+
+              </div>
+                    <pagination ng-show="chapterChk" total-items="chaptersCount" ng-model="currentPage" items-per-page="1" ></pagination>
+            </div>
+       </div>
+
+</div>
+    

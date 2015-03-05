@@ -1,0 +1,18 @@
+<!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Everyone's a writer!</h1>
+        <p>We believe everyone has a writer's spirit and is ready to unleash their ideas.  We give you platform to collaborate and work together creating an unforgettable story.</p>
+        <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-4" ng-repeat="(key, tale) in tales | orderBy: '-date' | limitTo: 3">
+          <h2>{{tale.title}}</h2>
+          <p>{{tale.description}}.</p>
+          <p><a class="btn btn-default" ng-href="#/read-tales/{{key}}" role="button">Read Story &raquo;</a></p>
+        </div>
+      </div>

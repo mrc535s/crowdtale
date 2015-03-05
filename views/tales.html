@@ -1,0 +1,132 @@
+<div class="container">
+      <!-- Example row of columns -->
+      <div class="row" >
+      	<div class="col-md-3">
+      <h1>{{currentUser.firstname}}'s Tale's</h1>
+ 		 </div>
+ 		 <div class="col-md-9">
+ 		 	       <div class="form-group" style="width:30%; margin-top: 10px; margin-left:15px;">
+			        	<label for="type">Filter Results</label>
+			        	<select class="form-control" ng-model="filtertales" id="newType" name="type">
+			        		<option>Tales In-Work</option>
+						    <option>All</option>
+						    <option ng-selected="true">Created By Me</option>
+						  </select>
+
+			        </div>
+		</div></div>
+
+   <div class="row" style="margin-top: 10px;">
+        <div class="col-md-3">
+      
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h1 class="panel-title">Create New Tale</h1>
+
+        </div>
+
+        <div class="panel-body">
+
+			    <form name="storyForm" novalidate>
+
+			        <div class="form-group">
+			        	<label for="title">Tale Title</label>
+			            <input type="text" ng-model="newTitle" class="form-control" id="title" name="title" placeholder="Title" required>
+
+			        </div>
+
+			        <div class="form-group">
+			        	<label for="type">Select Type of Tale</label>
+			        	<select class="form-control" ng-model="newType" id="newType" name="type" required>
+						    <option>Micro</option>
+						    <option>Mini</option>
+						    <option>Kids</option>
+						    <option>Short</option>
+						    <option>Book</option>
+						    <option>Novel</option>
+						  </select>
+
+			        </div>
+
+			        <div class="form-group">
+			        	<label for="type">Select Genre</label>
+			        	<select class="form-control" ng-model="genre" id="genre" name="genre" required>
+						    <option>Thriller</option>
+						    <option>Educational</option>
+						    <option>Action</option>
+						    <option>Comedy</option>
+						    <option>Drama</option>
+						    <option>Something New</option>
+						  </select>
+
+			        </div>
+
+
+			        <div class="form-group">
+			        	<label for="desc">Tale Description</label>
+			            <textarea maxlength="100" ng-model="description" class="form-control" id="desc" name="desc" placeholder="Description" required></textarea>
+
+			        </div>
+
+			        <button ng-disabled="storyForm.$invalid" type="submit" style="width:100%;" ng-click="createTale(storyForm.$valid)" class="btn btn-primary">Create Tale</button>
+
+			    </form>
+        </div>
+
+    </div> 
+</div>
+
+<div class="col-md-9">
+
+<div class="col-md-4" ng-repeat="(key, tale) in talesArray  | filterTales:username:filtertales | orderBy: tale.futureDate: true"> 
+      <div class="panel panel-default" >
+
+        <div class="panel-heading">
+        	            <a class="close" style="line-height:0.7" ng-show="checkOwnership(tale.createdby)" ng-click="deleteTale(tale.$id)">&times;</a>
+
+            <h1 class="panel-title" >{{tale.title}} ({{tale.genre}})</h1> 
+
+
+        </div>
+
+        <div class="panel-body">
+
+			    <form>
+
+			        <div class="form-group">
+
+			           
+
+			        </div>
+
+			        <div class="form-group">
+
+			            <p > {{tale.description}} </p>
+
+			        </div>
+
+
+			        <div class="form-group">
+
+			           <p > <strong>{{tale.type}} </strong></p> <timer end-time='tale.futureDate'>{{days}} days, {{hours}} hours, {{minutes}} minutes, {{seconds}} seconds.</timer>
+
+			        </div>
+			       <a ng-href="#/read-tales/{{tale.$id}}" type="submit" style="width:49%;"  class="btn btn-primary">View Tale</a>
+			        <a ng-href="#/write-tale/{{tale.$id}}" type="submit" style="width:49%;"  class="btn btn-default">Edit Tale</a>
+
+			    </form>
+        </div>
+
+    </div>
+
+       </div>
+
+        </div>
+</div>
+
+  </div>
+
+
