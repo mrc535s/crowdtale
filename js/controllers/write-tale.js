@@ -10,7 +10,7 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 
 
 	function addMinutes(minutes) {
-		var date = Date.now();
+		var date = new Date (Date.now());
     	return new Date(date.getTime() + minutes*60000);
 	}
 
