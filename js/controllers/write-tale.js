@@ -3,81 +3,70 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 	Date.prototype.addHours= function(h){
 	    this.setHours(this.getHours()+h);
 	    return this;
-	}
+	} //This function modifies the date and used in a later function.
 	
-	var ref = new Firebase(FIREBASE_URL);
-	var simpleLogin = $firebaseAuth(ref);
+	var ref = new Firebase(FIREBASE_URL); //A basic reference to the Firebase tree for Crowdtale
+	var simpleLogin = $firebaseAuth(ref); //Firebase Authentication service creation.  This is one of the dependcies found above.
 
 
-	function addMinutes(minutes) {
+	function addMinutes(minutes) {  //This function is used below.
 		var date = new Date (Date.now());
     	return new Date(date.getTime() + minutes*60000);
 	}
 
 	//var ref = new Firebase (FIREBASE_URL + '/users/' +  + 'meetings');
 
-	var authData = simpleLogin.$getAuth();
+	var authData = simpleLogin.$getAuth();//We can access the authenication datea for the user.
 
-	if (authData) {
+	if (authData) { //Make sure the user is authenicated
 		
-		var key = $routeParams.key;
-		var username = authData.uid;
+	var key = $routeParams.key; //the key is sent as a get parameter in the URL.  This is manipulated using AngularJS routing.
+	var username = authData.uid; //We get the uid in the Authentication.  We use this frequently in tasks below for creation.
 
-		$scope.setPage = function (pageNo) {
+	$scope.setPage = function (pageNo) {
    			 $scope.currentPage = pageNo;
-  		};
+  	};
 
+	$scope.checkOwnership = function(creator) {
 
-
-
-		$scope.checkOwnership = function(creator) {
-
-			if (creator == username)
-			{
-				return true;
-			}
-
-		};
-
-		$scope.tales = [];
-		$scope.count = 0;
-		$scope.date = Date.now();
-		$scope.username = username;
-		$scope.userDraw = false;
-
-		//Get the tales date from firebase
-		var talesURL =  "/tales";
-
-		var ref = new Firebase (FIREBASE_URL + talesURL);
-
-		var talesInfo = $firebase(ref);
-		
-		//$scope.talesInfo = talesInfo.$asObject();
-		var tales = $firebase(ref).$asObject();
-		var talesArray = $firebase(ref).$asArray();
-
-		tales.$loaded().then(function(data){
-			$scope.tales = tales;
-
-	
-		});
-
-		talesArray.$loaded().then(function(data){
-			$scope.talesArray = talesArray;
-			$rootScope.howManytales = talesArray.length;
-		});
-
-		talesArray.$watch(function(event){
-			$rootScope.howManytales = talesArray.length;
-		});
-
-
-		$scope.deleteTale=function(key) {
-
-			var confirm = window.confirm("Are you sure you want to delete?");
-			if (confirm)
-				talesInfo.$remove(key);
+		if (creator == username)
+		{
+			return true;
 		}
+
+	};
+
+//Setup some intiial variables.
+
+	$scope.tales = [];
+	$scope.count = 0;
+	$scope.date = Date.now();
+	$scope.username = username;
+	$scope.userDraw = false;
+
+	//Get the tales date from firebase
+	var talesURL =  "/tales";
+	var ref = new Firebase (FIREBASE_URL + talesURL);
+	var talesInfo = $firebase(ref);
+	var tales = $firebase(ref).$asObject(); //Gets the Firebase reference as a JSON object.
+	var talesArray = $firebase(ref).$asArray();//Gets the same Firebase reference as an array.
+
+	tales.$loaded().then(function(data){ //Make sure the tales are loaded, then load the tales into the scope.
+		$scope.tales = tales;
+
+	});
+
+	talesArray.$loaded().then(function(data){
+		$scope.talesArray = talesArray;
+		$rootScope.howManytales = talesArray.length;
+	});
+
+	$scope.deleteTale=function(key) { //Function to delete a tale.
+
+		var confirm = window.confirm("Are you sure you want to delete?");
+		if (confirm)
+			talesInfo.$remove(key);
+	}
 
       if (tales) //Make sure there are some tales 
       {
@@ -86,51 +75,35 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
         
       	var taleref = new Firebase (FIREBASE_URL + talesURL + "/" + key + "/" );
       	var taleChapterRef = new Firebase (FIREBASE_URL + "/taleChapters/" + key + "/");
-
       	var talechild = $firebase(taleChapterRef.child(username));
-
       	$scope.chapters = $firebase(taleChapterRef).$asArray();
-      	//$scope.allAuthors = array();
-
       	$scope.currentPage = 1;
-
       	var taleChapter = talechild.$asObject();
-
 		var thistale = $firebase(taleref).$asObject();
-
 		var thistaleArray = $firebase(taleref).$asArray();
-
 
 		thistaleArray.$loaded().then(function(data)
 		{
 			$scope.thistaleArray = thistaleArray[4];
-
-			console.log ($scope.thistaleArray);
-
+			//console.log ($scope.thistaleArray);
 		});
 
 
-		taleChapter.$loaded().then(function(data)
+		taleChapter.$loaded().then(function(data) //Load the tale chapter based on the referernce above.
 		{
 			$scope.taleChapter = taleChapter;
-
 			if (!taleChapter.text) 
 			{
-
-
-				$scope.showPublishTaleButton = false;
+				$scope.showPublishTaleButton = false;//the Publish Tale button is shown if there is is text in the taleChapter.  
 			}
 			else
 				$scope.showPublishTaleButton = true;
 
 		});
 
-		
-		
-
-		thistale.$loaded()
-		  .then(function(data) {
-		  	$scope.thistale = thistale;
+		thistale.$loaded() //Load all this tale based on the key value from Firebase.  
+		  .then(function(data) { //Once loaded, perform the follwing actions.  Most of the actiona below have a dependency on the data being loaded.
+		  	$scope.thistale = thistale;  //Assing the tale to the scope.
 
 		  	if ($scope.thistale.status == "published")
 		  		$location.path( "/read-tales/" + key );
@@ -138,8 +111,7 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 		  	if ($scope.thistale.drawMode == true)
 		  		$scope.userDraw = true;
 
-
-			$scope.countOf = function(text) {
+			$scope.countOf = function(text) { //Tracks data input for a story chapter in the text area.
 		    	var s = text ? text.split(/\s+/) : 0; 
 
 		    	if (s.length > 50)
@@ -148,16 +120,10 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 		    		return s ? s.length : '';
 		    	}
 		    	else {
-
 			    	$scope.msgshow = false;
-
 			    	if (s) {
 			    		$scope.taleChapter.words = s ? s.length : '';
-			    		
-
 			    		console.log($scope.taleChapter.words);
-
-
 			    		return s ? s.length : '';
 			    	}
 			    	else
@@ -166,7 +132,7 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 			    	
 
 			};
-		    if (($scope.thistale.status == "assigned") && ($scope.thistale.assigned_to == username))
+		    if (($scope.thistale.status == "assigned") && ($scope.thistale.assigned_to == username))//make sure thist tale is assigned to the user.
 		    	if(!$scope.thistale.drawMode)
 	       			$scope.showEditor = true;
 	       		else
@@ -193,26 +159,19 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 
 		  });
 
-
-		   $scope.chapters.$loaded().then(function(data){
-
+		    $scope.chapters.$loaded().then(function(data){
       		$scope.chaptersCount = $scope.chapters.length;
-      		//$scope.chapters.reverse();
 	      	$scope.$watch('currentPage', function() {
+
 				  var begin = ($scope.currentPage - 1) * 1;
 				  var end = begin + 1;
-
 				  $scope.paged = {
 				    chapters: $scope.chapters.slice(begin, end)
 				  }
-
-				  console.log($scope.paged.chapters);
 			});
 
 			 if ($scope.chaptersCount > 0)
       			$scope.chapterChk = true;
-
-	
 		});
 
 	$scope.showMsg = function (msg) {
@@ -221,12 +180,9 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 	};
 
 	$scope.takeControl = function () {
-		
-
 		$scope.thistale.status = "assigned";
 		$scope.thistale.assigned_to = username;
 
-	
 		thistale.$save();
 
 		$scope.showEditor = true;
@@ -235,25 +191,18 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 
 	};
 
-	 $scope.drawImg = function (this_author) {
+	 $scope.drawImg = function (this_author) { //Assigns the tale to the logged in user to draw an image for the chapter.
    		$scope.userDraw = true;
-
    		$scope.thistale.status = "assigned";
    		$scope.thistale.assigned_to = username;
    		$scope.thistale.drawMode = true;
 
    		var pixelDataRef = new Firebase(FIREBASE_URL + "/taleChapters/" + key + "/" + this_author + "/image");
-
-
-
    		var obj = $firebase(pixelDataRef);
 		obj.$update({author: username}).then(function(){
 			$scope.imageAuthor = true
 			//$scope.imageAuthor = false;
 		});
-
-
-
    		thistale.$save();
   	};
 
@@ -261,13 +210,9 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 	$scope.publishTale = function() {
 
 		var confirm = window.confirm("Are you sure you want to publish?  No changes can be made once the entire tale has been published");
-
-		
-
 		if (confirm) {
-
 			$scope.thistale.status = "published";
-		
+
 			thistale.$save().then(function(ref) {
 			  ref.key() === thistale.$id; // true
 
@@ -283,19 +228,9 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 	$scope.publishTaleChapter = function() {
 
 		var confirm = window.confirm("Are you sure you want to publish?  No changes can be made once the tale chapter has been published");
-
-
-
 		if (confirm) {
-
-			//Track the authors who have published to the tale.
 			
 			var totalAuthors = $scope.thistale.authors.length;
-
-			if ($scope.thistale.authors.totalAuthors != username)
-
-   				$scope.thistale.authors = {totalAuthors: username};
-
 			$scope.thistale.status = "open";
 		
 			thistale.$save().then(function(ref) {
@@ -316,20 +251,18 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 
 	}
 
-	$scope.closeMsg = function() { 
+		$scope.closeMsg = function() { 
 
-		$scope.msgSaved = false;
-	}
+			$scope.msgSaved = false;
+		}
 
-		$scope.saveTale = function() {
+		$scope.saveTale = function() { //Save the tale chapter text.
 
-		
 		$scope.taleChapter.published = false;
 		$scope.taleChapter.author = username;
-
 		$scope.thistale.totalWords = $scope.thistale.totalWords + $scope.taleChapter.words;
 
-		console.log($scope.thistale.totalWords);
+		//console.log($scope.thistale.totalWords);
 
 		taleChapter = $scope.taleChapter;
 
@@ -345,7 +278,7 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 
 	}
 
-	$scope.clearImage = function ()
+	$scope.clearImage = function () //clear the image content.
 	{
 		var pixelDataRef = new Firebase(FIREBASE_URL + "/taleChapters/" + key + "/" + $scope.author + "/image");
 		//pixelDataRef.remove();
@@ -368,7 +301,7 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 	
 	};
 
-	$scope.publishImage = function (this_author)
+	$scope.publishImage = function (this_author) //Publish the image
 	{
 		var pixelDataRef = new Firebase(FIREBASE_URL + "/taleChapters/" + key + "/" + this_author + "/image");
 		//pixelDataRef.remove();
@@ -407,160 +340,149 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 	
 	};
 
-	$scope.loadCanvas = function(author, this_key) {
-		    //Set up some globals
-    var pixSize = 8, lastPoint = null, currentColor = "000", mouseDown = 0;
+		$scope.loadCanvas = function(author, this_key) { //Load the canvas for each image chapter that has one.  Also setup functionality to draw on the canvas.
+			    //Set up some globals
+	    var pixSize = 8, lastPoint = null, currentColor = "000", mouseDown = 0;
+	    //Create a reference to the pixel data for our drawing.
+	    var pixelDataRef = new Firebase(FIREBASE_URL + "/taleChapters/" + key + "/" + author + "/image");
+	    var newAuthor = $firebase(pixelDataRef).$asObject();
 
-    //Create a reference to the pixel data for our drawing.
-    var pixelDataRef = new Firebase(FIREBASE_URL + "/taleChapters/" + key + "/" + author + "/image");
+	    newAuthor.$loaded().then(function(data){
+	    $scope.author = author;
 
-    var newAuthor = $firebase(pixelDataRef).$asObject();
+	  	checkParticipation(); //make sure user has not particpated in the tale chapter.
 
-    newAuthor.$loaded().then(function(data){
-    $scope.author = author;
-
-  	checkParticipation();
-
-    console.log('Key: ' + key);
-
-    if ((newAuthor.published == true) && (newAuthor.author == username))
-    {
-    	$location.path('/read-tales/' + key);
-    }
-
-    
-			
-
-    if (username != author) {
-	    if (!newAuthor.author) {
-	    	newAuthor.author = username;
-	    	newAuthor.$save(); 
+	    if ((newAuthor.published == true) && (newAuthor.author == username))
+	    {
+	    	$location.path('/read-tales/' + key);
 	    }
 
-	    if (!newAuthor.published) {
-	    	newAuthor.published = false;
-	    	newAuthor.$save();
-	    }
-	}
-    	if ((username == newAuthor.author) && (newAuthor.published == false))
-	    	$scope.imageAuthor = true
-
-	    else
-	    	$scope.imageAuthor = false;
-   
-
-    var myCanvas = document.getElementById('drawing-canvas-' + this_key);
-    var myContext = myCanvas.getContext ? myCanvas.getContext('2d') : null;
-    if (myContext == null) {
-      alert("You must use a browser that supports HTML5 Canvas to run this demo.");
-      return;
-    }
-
-    //Setup each color palette & add it to the screen
-    var colors = ["fff","000","f00","0f0","00f","88f","f8d","f88","f05","f80","0f8","cf0","08f","408","ff8","8ff"];
-    for (c in colors) {
-      var item = $('<div/>').css("background-color", '#' + colors[c]).addClass("colorbox");
-      item.click((function () {
-        var col = colors[c];
-        return function () {
-          currentColor = col;
-        };
-      })());
-      item.appendTo('#colorholder');
-    }
-
-    //Keep track of if the mouse is up or down
-    myCanvas.onmousedown = function () {mouseDown = 1;};
-    myCanvas.onmouseout = myCanvas.onmouseup = function () {
-      mouseDown = 0; lastPoint = null;
-    };
-
-    //Draw a line from the mouse's last position to its current position
-    var drawLineOnMouseMove = function(e) {
-      if (!mouseDown) return;
-
-      e.preventDefault();
-
-      // Bresenham's line algorithm. We use this to ensure smooth lines are drawn
-      var offset = $('canvas').offset();
-      var x1 = Math.floor((e.pageX - offset.left) / pixSize - 1),
-        y1 = Math.floor((e.pageY - offset.top) / pixSize - 1);
-      var x0 = (lastPoint == null) ? x1 : lastPoint[0];
-      var y0 = (lastPoint == null) ? y1 : lastPoint[1];
-      var dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
-      var sx = (x0 < x1) ? 1 : -1, sy = (y0 < y1) ? 1 : -1, err = dx - dy;
-      while (true) {
-        //write the pixel into Firebase, or if we are drawing white, remove the pixel
-         if ($scope.imageAuthor){
-        	pixelDataRef.child(x0 + ":" + y0).set(currentColor === "fff" ? null : currentColor);
-
-    	}
-
-        if (x0 == x1 && y0 == y1) break;
-        var e2 = 2 * err;
-        if (e2 > -dy) {
-          err = err - dy;
-          x0 = x0 + sx;
-        }
-        if (e2 < dx) {
-          err = err + dx;
-          y0 = y0 + sy;
-        }
-      }
-      lastPoint = [x1, y1];
-    };
-
-   
-	    $(myCanvas).mousemove(drawLineOnMouseMove);
-	    $(myCanvas).mousedown(drawLineOnMouseMove);
-
-
-    // Add callbacks that are fired any time the pixel data changes and adjusts the canvas appropriately.
-    // Note that child_added events will be fired for initial pixel data as well.
-	    var drawPixel = function(snapshot) {
-	      var coords = snapshot.key().split(":");
-	      myContext.fillStyle = "#" + snapshot.val();
-	      myContext.fillRect(parseInt(coords[0]) * pixSize, parseInt(coords[1]) * pixSize, pixSize, pixSize);
-	    };
-	    var clearPixel = function(snapshot) {
-	      var coords = snapshot.key().split(":");
-	      myContext.clearRect(parseInt(coords[0]) * pixSize, parseInt(coords[1]) * pixSize, pixSize, pixSize);
-	    };
-	    pixelDataRef.on('child_added', drawPixel);
-	    pixelDataRef.on('child_changed', drawPixel);
-	    pixelDataRef.on('child_removed', clearPixel);
-	
-		function checkParticipation() {
-			var chapAuthor = $scope.author;
-
-			var pixelDataRef = new Firebase(FIREBASE_URL + "/taleChapters/" + key + "/" + chapAuthor);
-
-		    var thisChapter = $firebase(pixelDataRef).$asObject();
-
-		    thisChapter.$loaded().then(function(data){
-		    
-		    if ((thisChapter.published == true) && (thisChapter.author == username))
-		    {
-		    	if (thistale.createdby == username)
-		    		$scope.publishOnly = true;
-		    	else
-		    		$location.path('/read-tales/' + key);
+	    if (username != author) {
+		    if (!newAuthor.author) {
+		    	newAuthor.author = username;
+		    	newAuthor.$save(); 
 		    }
-			});
 
-
+		    if (!newAuthor.published) {
+		    	newAuthor.published = false;
+		    	newAuthor.$save();
+		    }
 		}
+	    	if ((username == newAuthor.author) && (newAuthor.published == false))
+		    	$scope.imageAuthor = true
 
-		});
+		    else
+		    	$scope.imageAuthor = false;
+	   
+
+	    var myCanvas = document.getElementById('drawing-canvas-' + this_key);
+	    var myContext = myCanvas.getContext ? myCanvas.getContext('2d') : null;
+	    if (myContext == null) {
+	      alert("You must use a browser that supports HTML5 Canvas to run this demo.");
+	      return;
+	    }
+
+	    //Setup each color palette & add it to the screen
+	    var colors = ["fff","000","f00","0f0","00f","88f","f8d","f88","f05","f80","0f8","cf0","08f","408","ff8","8ff"];
+	    for (c in colors) {
+	      var item = $('<div/>').css("background-color", '#' + colors[c]).addClass("colorbox");
+	      item.click((function () {
+	        var col = colors[c];
+	        return function () {
+	          currentColor = col;
+	        };
+	      })());
+	      item.appendTo('#colorholder');
+	    }
+
+	    //Keep track of if the mouse is up or down
+	    myCanvas.onmousedown = function () {mouseDown = 1;};
+	    myCanvas.onmouseout = myCanvas.onmouseup = function () {
+	      mouseDown = 0; lastPoint = null;
+	    };
+
+	    //Draw a line from the mouse's last position to its current position
+	    var drawLineOnMouseMove = function(e) {
+	      if (!mouseDown) return;
+
+	      e.preventDefault();
+
+	      // Bresenham's line algorithm. We use this to ensure smooth lines are drawn
+	      var offset = $('canvas').offset();
+	      var x1 = Math.floor((e.pageX - offset.left) / pixSize - 1),
+	        y1 = Math.floor((e.pageY - offset.top) / pixSize - 1);
+	      var x0 = (lastPoint == null) ? x1 : lastPoint[0];
+	      var y0 = (lastPoint == null) ? y1 : lastPoint[1];
+	      var dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
+	      var sx = (x0 < x1) ? 1 : -1, sy = (y0 < y1) ? 1 : -1, err = dx - dy;
+	      while (true) {
+	        //write the pixel into Firebase, or if we are drawing white, remove the pixel
+	         if ($scope.imageAuthor){
+	        	pixelDataRef.child(x0 + ":" + y0).set(currentColor === "fff" ? null : currentColor);
+
+	    	}
+
+	        if (x0 == x1 && y0 == y1) break;
+	        var e2 = 2 * err;
+	        if (e2 > -dy) {
+	          err = err - dy;
+	          x0 = x0 + sx;
+	        }
+	        if (e2 < dx) {
+	          err = err + dx;
+	          y0 = y0 + sy;
+	        }
+	      }
+	      lastPoint = [x1, y1];
+	    };
+
+	   
+		    $(myCanvas).mousemove(drawLineOnMouseMove);
+		    $(myCanvas).mousedown(drawLineOnMouseMove);
+
+
+	    // Add callbacks that are fired any time the pixel data changes and adjusts the canvas appropriately.
+	    // Note that child_added events will be fired for initial pixel data as well.
+		    var drawPixel = function(snapshot) {
+		      var coords = snapshot.key().split(":");
+		      myContext.fillStyle = "#" + snapshot.val();
+		      myContext.fillRect(parseInt(coords[0]) * pixSize, parseInt(coords[1]) * pixSize, pixSize, pixSize);
+		    };
+		    var clearPixel = function(snapshot) {
+		      var coords = snapshot.key().split(":");
+		      myContext.clearRect(parseInt(coords[0]) * pixSize, parseInt(coords[1]) * pixSize, pixSize, pixSize);
+		    };
+		    pixelDataRef.on('child_added', drawPixel);
+		    pixelDataRef.on('child_changed', drawPixel);
+		    pixelDataRef.on('child_removed', clearPixel);
+		
+			function checkParticipation() {
+				var chapAuthor = $scope.author;
+
+				var pixelDataRef = new Firebase(FIREBASE_URL + "/taleChapters/" + key + "/" + chapAuthor);
+
+			    var thisChapter = $firebase(pixelDataRef).$asObject();
+
+			    thisChapter.$loaded().then(function(data){
+			    
+			    if ((thisChapter.published == true) && (thisChapter.author == username))
+			    {
+			    	if (thistale.createdby == username)
+			    		$scope.publishOnly = true;
+			    	else
+			    		$location.path('/read-tales/' + key);
+			    }
+				});
+
+			}
+
+			});
 
 	};
 
-
-
-
 }
 
-	$scope.createTale = function(isValid) {
+	$scope.createTale = function(isValid) { // create Tale
 
 		var date = new Date (Date.now());
 
@@ -646,13 +568,6 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
 
 
 			})
-
-			//var taleKey = newTale.key();
-
-			
-
-
-
     	}
 
       }
@@ -663,8 +578,5 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
   {
   	$location.path('/login');
   }
-
-	
-
 
 }); //Tales Controller

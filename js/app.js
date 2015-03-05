@@ -50,9 +50,6 @@ myApp.filter('filterTales', function () {
             out: []
         };
 
-        //console.log(tales);
-
-       // console.log(myfilter);
 
         var date = new Date(Date.now()).getTime();
 
