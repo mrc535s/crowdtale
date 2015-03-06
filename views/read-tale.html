@@ -58,7 +58,48 @@
             </div>
 
        </div>
+
+              <div class = "row">
+  <div class="col-md-12">
+
+          <div class="panel panel-default" >
+
+        <div class="panel-heading">            
+            <h1 class="panel-title" >Comments</h1>
+        </div>
+
+        <div class="panel-body">
+
+          <div  class="well well-sm" ng-repeat="(key,comment) in comments">
+
+                
+                    <p> <strong>{{comment.author}}</strong> says <em>"{{comment.comment }}"</em></p>
+         
+    
+        </div> 
+
+             <button ng-click="showComment()" type="submit"  class="btn btn-primary">Reply</button>
+
+                     <form ng-show="showCommentSection">
+
+              <div class="form-group" >
+          <textarea id="comment" class="form-control" style="width:90%; margin-top: 10px; height: 100px;" ng-model = "comment"></textarea> 
+
+              </div>
+             <button ng-click="addComment()" type="submit"  class="btn btn-primary">Add Comment</button>
+             
+          </form>
+             
+        </div>
+
     </div>
+
+  </div>
+
+  
+     
+
+  
 
 
 </div>

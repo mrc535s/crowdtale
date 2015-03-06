@@ -1,18 +1,15 @@
 myApp.controller('ReadTalesController', function($scope, $location, $routeParams, $rootScope, $firebase, $firebaseAuth, FIREBASE_URL) {
 
-	
 	var ref = new Firebase(FIREBASE_URL);
 	$scope.tales = [];
-
+	$scope.showCommentSection = false;
+	var simpleLogin = $firebaseAuth(ref);
+	var auth= simpleLogin.$getAuth();
 	var key = $routeParams.key;
 	var username = $routeParams.user;
-
 	var talesURL =  "/tales";
-
 	var ref = new Firebase (FIREBASE_URL + talesURL);
-
 	var talesInfo = $firebase(ref);
-	
 	//$scope.talesInfo = talesInfo.$asObject();
 	var tales = $firebase(ref).$asObject();
 	var talesArray = $firebase(ref).$asArray();
@@ -35,11 +32,13 @@ myApp.controller('ReadTalesController', function($scope, $location, $routeParams
     if (key) {
 
   	var taleref = new Firebase (FIREBASE_URL + talesURL + "/" + key + "/" );
+  	var commentRef = new Firebase (FIREBASE_URL + talesURL + "/" + key + "/comments" );
   	var taleChapterRef = new Firebase (FIREBASE_URL + "/taleChapters/" + key + "/");
   	$scope.chapters = $firebase(taleChapterRef).$asArray();
   	$scope.currentPage = 1;
   	$scope.chapters.$loaded().then(function(data){
   	$scope.chaptersCount = $scope.chapters.length;
+  	$scope.chapters.reverse();
 
 	if ($scope.chaptersCount > 0)
 		$scope.chapterChk = true;
@@ -57,6 +56,13 @@ myApp.controller('ReadTalesController', function($scope, $location, $routeParams
 	});
 
 	var thistale = $firebase(taleref).$asObject();
+	var tale = $firebase(commentRef).$asArray();
+
+	tale.$loaded() //Load all this tale based on the key value from Firebase.  
+		  .then(function(data) { 
+		  	$scope.comments = tale;
+
+		  });
 	$scope.thistale = thistale;
 
 	$scope.loadCanvasRead = function(author, this_key) {
@@ -157,6 +163,28 @@ myApp.controller('ReadTalesController', function($scope, $location, $routeParams
 		});
 
 		};
+
+	$scope.addComment = function () {
+
+		if (auth){
+			tale.$add({comment: $scope.comment, author: $rootScope.currentUser.firstname});
+		}
+		else
+		{
+			tale.$add({comment: $scope.comment, author: 'Guest User'});
+		}
+		
+		$scope.showCommentSection = false;
+		$scope.comment = ""
+
+	};
+
+	$scope.showComment = function () {
+		$scope.showCommentSection = true;
+
+	};
+
+
 
 
 }
