@@ -334,7 +334,10 @@ myApp.controller('TalesController', function($scope, $location, $routeParams, $r
    		
 
    		//thistale.$push({authors:username}).then(function() {
-   		thistale.$save();
+   		thistale.$save().then(function(){
+   			$location.path("/read-tales/" + key);
+   		});
+
 
 	
 	
